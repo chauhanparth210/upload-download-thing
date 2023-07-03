@@ -2,6 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Mutation {
+  uploadFile(file: Upload!): String!
+}
+
 type Query {
   getHello: String!
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload

@@ -11,6 +11,11 @@ import * as typeOrmConfigration from "orm.config";
   imports: [
     TypeOrmModule.forRoot(typeOrmConfigration),
     GraphQLModule.forRoot({
+      /**
+       * disabled the default upload middleware
+       * because it is vulnerable to CSRF attack
+       */
+      uploads: false,
       autoSchemaFile: join(process.cwd(), "src/schema.gql"),
     }),
     FileModule,
