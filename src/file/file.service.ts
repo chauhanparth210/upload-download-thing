@@ -1,9 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { storeFile } from "src/utils/store-file";
+import { getFilePath, storeFile } from "src/utils/store-file";
 import { FileEntity } from "./file.entity";
 import { Repository } from "typeorm";
-import { BUCKET_DIRECTORY } from "src/constants";
 
 @Injectable()
 export class FileService {
@@ -22,7 +21,7 @@ export class FileService {
     const fileDetails = this.fileRepository.create({
       filename,
       mimetype,
-      location: `${BUCKET_DIRECTORY}/${filename}`,
+      location: getFilePath(filename),
     });
     await this.fileRepository.insert(fileDetails);
 
