@@ -36,7 +36,7 @@ export class UploadService {
             { id: fileId },
             {
               uploadingStatus: UPLOAD_TYPE.FAILED,
-              reasonForFailed: BIG_FILE_SIZE_ERROR_MESSAGE,
+              reasonOfFailure: BIG_FILE_SIZE_ERROR_MESSAGE,
             }
           );
         }

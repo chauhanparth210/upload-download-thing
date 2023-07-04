@@ -32,7 +32,7 @@ export class FileEntity {
   size: number;
 
   @Column({ nullable: true })
-  reasonForFailed: string;
+  reasonOfFailure: string;
 
   @CreateDateColumn()
   created!: Date;
