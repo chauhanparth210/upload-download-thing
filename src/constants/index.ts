@@ -5,3 +5,5 @@ export enum UPLOAD_TYPE {
   UPLOADING = "uploading",
   COMPLETED = "completed",
 }
+
+export const BIG_FILE_SIZE_ERROR_MESSAGE = "file size was big";
