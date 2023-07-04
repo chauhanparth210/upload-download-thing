@@ -5,6 +5,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { GraphQLModule } from "@nestjs/graphql";
 import { join } from "path";
 import { FileModule } from "./file/file.module";
+import { UploadModule } from './upload/upload.module';
 import * as typeOrmConfigration from "orm.config";
 
 @Module({
@@ -19,6 +20,7 @@ import * as typeOrmConfigration from "orm.config";
       autoSchemaFile: join(process.cwd(), "src/schema.gql"),
     }),
     FileModule,
+    UploadModule,
   ],
   providers: [AppService, AppResolver],
 })
