@@ -1,36 +1,51 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { getFilePath, storeFile } from "src/utils/store-file";
+import { getFilePath } from "src/utils";
 import { FileEntity } from "./file.entity";
-import { Repository } from "typeorm";
+import { Connection, Repository } from "typeorm";
+import { UploadService } from "src/upload/upload.service";
+import { SUPPORTED_FILE_FORMETS } from "src/config";
+import { FileUpload } from "graphql-upload";
 
 @Injectable()
 export class FileService {
   constructor(
     @InjectRepository(FileEntity)
-    private readonly fileRepository: Repository<FileEntity>
+    private readonly fileRepository: Repository<FileEntity>,
+    private uploadService: UploadService,
+    private readonly connection: Connection
   ) {}
 
-  async uploadFile(file) {
-    console.log({ file });
+  async uploadFile(file: FileUpload) {
     const { filename, mimetype, createReadStream } = file;
 
     // check for the supported file types
+    const isFileSupported = SUPPORTED_FILE_FORMETS.includes(mimetype);
+    if (!isFileSupported) {
+      throw new HttpException(
+        `${mimetype} file type is not supported`,
+        HttpStatus.NOT_IMPLEMENTED
+      );
+    }
 
-    // save the file details into our database
+    // save the file details into database
     const fileDetails = this.fileRepository.create({
       filename,
       mimetype,
       location: getFilePath(filename),
     });
     await this.fileRepository.insert(fileDetails);
+    const fileId = fileDetails.id;
 
-    // handle the uplaod case
-    const stream = createReadStream();
-    storeFile({ stream, filename });
+    const fileReadableStream = createReadStream();
+    this.uploadService.storeFile({
+      fileReadableStream,
+      filename,
+      fileId,
+    });
 
     return {
-      fileId: fileDetails.id,
+      fileId,
       message: `${filename} file is uploading...`,
     };
   }
