@@ -28,6 +28,12 @@ export class FileEntity {
   })
   uploadingStatus!: UPLOAD_TYPE;
 
+  @Column({ nullable: true })
+  size: number;
+
+  @Column({ nullable: true })
+  reasonForFailed: string;
+
   @CreateDateColumn()
   created!: Date;
 
