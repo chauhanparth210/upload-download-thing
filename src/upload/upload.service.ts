@@ -10,6 +10,7 @@ import { SUPPORTED_MAX_FILE_SIZE } from "src/config";
 import { Repository } from "typeorm";
 import { FileEntity } from "src/file/file.entity";
 import { InjectRepository } from "@nestjs/typeorm";
+import { ReadStream } from "fs-capacitor";
 
 @Injectable()
 export class UploadService {
@@ -30,7 +31,7 @@ export class UploadService {
     filename,
     fileId,
   }: {
-    fileReadStream;
+    fileReadStream: ReadStream;
     filename: string;
     fileId: string;
   }) {
@@ -71,9 +72,10 @@ export class UploadService {
             { id: fileId },
             {
               uploadingStatus: UPLOAD_TYPE.FAILED,
+              reasonOfFailure: error.message,
             }
           );
-          throw new Error(error);
+          throw error;
         });
     } catch (error) {
       console.error({ error });
