@@ -7,6 +7,12 @@ import { UploadFileResponse } from "./upload-file.response";
 export class FileResolver {
   constructor(private readonly fileService: FileService) {}
 
+  /**
+   * Mutation endpoint to upload the supported file
+   * @param {FileUpload} file
+   * @return {Promise<UploadFileResponse>}
+   * @memberof FileResolver
+   */
   @Mutation(() => UploadFileResponse)
   uploadFile(
     @Args({ name: "file", type: () => GraphQLUpload })

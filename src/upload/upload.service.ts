@@ -18,42 +18,65 @@ export class UploadService {
     private readonly fileRepository: Repository<FileEntity>
   ) {}
 
-  storeFile({ fileReadableStream, filename, fileId }) {
-    const filePath = getFilePath(filename);
-    createDirIfNotExists(BUCKET_DIRECTORY);
+  /**
+   * Function to store the file on the bucket and save the file location
+   * @param fileReadStream ReadStream to read the file in small chunks
+   * @param filename name of the file
+   * @param fileId file identifier
+   * @returns
+   */
+  storeFile({
+    fileReadStream,
+    filename,
+    fileId,
+  }: {
+    fileReadStream;
+    filename: string;
+    fileId: string;
+  }) {
+    try {
+      const filePath = getFilePath(filename);
+      createDirIfNotExists(BUCKET_DIRECTORY);
 
-    let byteLength = 0;
-    fileReadableStream
-      .on("data", (data: Buffer) => {
-        byteLength += data.length;
-        if (byteLength > SUPPORTED_MAX_FILE_SIZE) {
-          fileReadableStream.destroy();
-          // delete the truncated file
-          fs.unlink(filePath, (err) => {
-            if (err) throw err;
-          });
+      let byteLength = 0;
+      fileReadStream
+        .on("data", (data: Buffer) => {
+          byteLength += data.length;
+          if (byteLength > SUPPORTED_MAX_FILE_SIZE) {
+            this.fileRepository.update(
+              { id: fileId },
+              {
+                uploadingStatus: UPLOAD_TYPE.FAILED,
+                reasonOfFailure: BIG_FILE_SIZE_ERROR_MESSAGE,
+              }
+            );
+            // delete the truncated file & close the readsteam
+            fs.unlink(filePath, () => {});
+            fileReadStream.destroy();
+          }
+        })
+        .pipe(fs.createWriteStream(filePath))
+        .on("finish", () => {
+          this.fileRepository.update(
+            { id: fileId },
+            {
+              uploadingStatus: UPLOAD_TYPE.COMPLETED,
+              size: byteLength,
+              location: filePath,
+            }
+          );
+        })
+        .on("error", (error) => {
           this.fileRepository.update(
             { id: fileId },
             {
               uploadingStatus: UPLOAD_TYPE.FAILED,
-              reasonOfFailure: BIG_FILE_SIZE_ERROR_MESSAGE,
             }
           );
-        }
-      })
-      .pipe(fs.createWriteStream(filePath))
-      .on("finish", () => {
-        this.fileRepository.update(
-          { id: fileId },
-          {
-            uploadingStatus: UPLOAD_TYPE.COMPLETED,
-            size: byteLength,
-            location: filePath,
-          }
-        );
-      })
-      .on("error", (error) => {
-        console.log({ error });
-      });
+          throw new Error(error);
+        });
+    } catch (error) {
+      console.error({ error });
+    }
   }
 }

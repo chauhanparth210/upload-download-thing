@@ -1,11 +1,15 @@
-import { Injectable, UnsupportedMediaTypeException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnsupportedMediaTypeException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { getFilePath } from "src/utils";
 import { FileEntity } from "./file.entity";
 import { Repository } from "typeorm";
 import { UploadService } from "src/upload/upload.service";
 import { SUPPORTED_FILE_FORMETS } from "src/config";
 import { FileUpload } from "graphql-upload";
+import { UploadFileResponse } from "./upload-file.response";
 
 @Injectable()
 export class FileService {
@@ -15,35 +19,45 @@ export class FileService {
     private uploadService: UploadService
   ) {}
 
-  async uploadFile(file: FileUpload) {
-    const { filename, mimetype, createReadStream } = file;
+  /**
+   * Function to upload supported file and save the file metadata
+   * Uses {@link UploadService} to store the file on the bucket
+   * @param file object of type `FileUpload`
+   * @returns {Promise<UploadFileResponse>}
+   */
+  async uploadFile(file: FileUpload): Promise<UploadFileResponse> {
+    try {
+      const { filename, mimetype, createReadStream } = file;
 
-    // check for the supported file types
-    const isFileSupported = SUPPORTED_FILE_FORMETS.includes(mimetype);
-    if (!isFileSupported) {
-      throw new UnsupportedMediaTypeException(
-        `${mimetype} file type is not supported`
-      );
+      // check for the supported file types
+      const isFileSupported = SUPPORTED_FILE_FORMETS.includes(mimetype);
+      if (!isFileSupported) {
+        throw new UnsupportedMediaTypeException(
+          `${mimetype} file type is not supported`
+        );
+      }
+
+      // save the file metadata
+      const fileDetails = this.fileRepository.create({
+        filename,
+        mimetype,
+      });
+      await this.fileRepository.insert(fileDetails);
+      const fileId = fileDetails.id;
+
+      const fileReadStream = createReadStream();
+      this.uploadService.storeFile({
+        fileReadStream,
+        filename,
+        fileId,
+      });
+
+      return {
+        fileId,
+        message: `${filename} file is uploading...`,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
     }
-
-    // save the file details into database
-    const fileDetails = this.fileRepository.create({
-      filename,
-      mimetype,
-    });
-    await this.fileRepository.insert(fileDetails);
-    const fileId = fileDetails.id;
-
-    const fileReadableStream = createReadStream();
-    this.uploadService.storeFile({
-      fileReadableStream,
-      filename,
-      fileId,
-    });
-
-    return {
-      fileId,
-      message: `${filename} file is uploading...`,
-    };
   }
 }
