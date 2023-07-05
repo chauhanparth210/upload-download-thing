@@ -18,8 +18,8 @@ export class FileEntity {
   @Column()
   mimetype!: string;
 
-  @Column()
-  location!: string;
+  @Column({ nullable: true })
+  location: string;
 
   @Column({
     type: "enum",

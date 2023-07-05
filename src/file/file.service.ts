@@ -30,7 +30,6 @@ export class FileService {
     const fileDetails = this.fileRepository.create({
       filename,
       mimetype,
-      location: getFilePath(filename),
     });
     await this.fileRepository.insert(fileDetails);
     const fileId = fileDetails.id;

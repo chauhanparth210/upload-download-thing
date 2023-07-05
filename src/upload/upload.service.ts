@@ -48,6 +48,7 @@ export class UploadService {
           {
             uploadingStatus: UPLOAD_TYPE.COMPLETED,
             size: byteLength,
+            location: filePath,
           }
         );
       })
