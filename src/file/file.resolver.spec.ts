@@ -3,7 +3,7 @@ import { FileResolver } from "./file.resolver";
 import { FileService } from "./file.service";
 
 jest.mock("src/config", () => ({
-  SUPPORTED_FILE_FORMETS: ["application/pdf"],
+  SUPPORTED_FILE_FORMATS: ["application/pdf"],
 }));
 
 describe("FileResolver", () => {

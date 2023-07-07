@@ -20,8 +20,8 @@ POSTGRES_PASSWORD
 POSTGRES_DB
 APPLICATION_PORT
 
-# supported file formets
-SUPPORTED_FILE_FORMETS=application/pdf,image/jpeg,image/png,audio/mpeg,video/mp4
+# supported file formats
+SUPPORTED_FILE_FORMATS=application/pdf,image/jpeg,image/png,audio/mpeg,video/mp4
 
 # supported max file size(here 10MB)
 SUPPORTED_MAX_FILE_SIZE=1048576

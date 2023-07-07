@@ -7,7 +7,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { FileEntity } from "./file.entity";
 import { Repository } from "typeorm";
 import { UploadService } from "src/upload/upload.service";
-import { SUPPORTED_FILE_FORMETS } from "src/config";
+import { SUPPORTED_FILE_FORMATS } from "src/config";
 import { FileUpload } from "graphql-upload";
 import { UploadFileResponse } from "./upload-file.response";
 
@@ -30,7 +30,7 @@ export class FileService {
       const { filename, mimetype, createReadStream } = file;
 
       // check for the supported file types
-      const isFileSupported = SUPPORTED_FILE_FORMETS.includes(mimetype);
+      const isFileSupported = SUPPORTED_FILE_FORMATS.includes(mimetype);
       if (!isFileSupported) {
         throw new UnsupportedMediaTypeException(
           `${mimetype} file type is not supported`

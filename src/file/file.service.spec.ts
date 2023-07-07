@@ -8,7 +8,7 @@ import { FileEntity } from "./file.entity";
 import { UnsupportedMediaTypeException } from "@nestjs/common";
 
 jest.mock("src/config", () => ({
-  SUPPORTED_FILE_FORMETS: ["application/pdf"],
+  SUPPORTED_FILE_FORMATS: ["application/pdf"],
 }));
 
 describe("FileService", () => {
