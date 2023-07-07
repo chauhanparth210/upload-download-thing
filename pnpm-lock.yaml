@@ -28,7 +28,7 @@ specifiers:
   eslint: ^8.0.1
   eslint-config-prettier: ^8.3.0
   eslint-plugin-prettier: ^4.0.0
-  fs-capacitor: ^8.0.0
+  fs-capacitor: ^6.2.0
   graphql: 14.5.8
   graphql-subscriptions: 1.1.0
   graphql-upload: ^13.0.0
@@ -84,7 +84,7 @@ devDependencies:
   eslint: 8.43.0
   eslint-config-prettier: 8.8.0_eslint@8.43.0
   eslint-plugin-prettier: 4.2.1_zh6vkmzat4wtnmvmftdassiwyu
-  fs-capacitor: 8.0.0
+  fs-capacitor: 6.2.0
   jest: 26.6.0_ts-node@10.9.1
   prettier: 2.8.8
   source-map-support: 0.5.21
@@ -4979,7 +4979,6 @@ packages:
   /fs-capacitor/6.2.0:
     resolution: {integrity: sha512-nKcE1UduoSKX27NSZlg879LdQc94OtbOsEmKMN2MBNudXREvijRKx2GEBsTMTfws+BrbkJoEuynbGSVRSpauvw==}
     engines: {node: '>=10'}
-    dev: false
 
   /fs-capacitor/8.0.0:
     resolution: {integrity: sha512-+Lk6iSKajdGw+7XYxUkwIzreJ2G1JFlYOdnKJv5PzwFLVsoJYBpCuS7WPIUSNT1IbQaEWT1nhYU63Ud03DyzLA==}

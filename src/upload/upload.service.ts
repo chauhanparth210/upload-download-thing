@@ -75,7 +75,6 @@ export class UploadService {
               reasonOfFailure: error.message,
             }
           );
-          throw error;
         });
     } catch (error) {
       console.error({ error });
