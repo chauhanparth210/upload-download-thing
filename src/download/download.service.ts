@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import type { Response } from "express";
 import { FileEntity } from "src/file/file.entity";
@@ -12,19 +12,13 @@ export class DownloadService {
     @InjectRepository(FileEntity)
     private readonly fileRepository: Repository<FileEntity>
   ) {}
-  async downloadFile(res: Response, fileId: string) {
-    const fileObj = await this.fileRepository.findOne(fileId);
-
-    // res.setHeader(
-    //   "Content-disposition",
-    //   "attachment; filename=" + fileObj.filename
-    // );
-    // res.setHeader("Content-type", fileObj.mimetype);
-    const path = `${BUCKET_DIRECTORY}/${fileObj.filename}`;
-
-    // const filestream = fs.createReadStream(path);
-    // filestream.pipe(res);
-
-    res.download(path);
+  async downloadFile(res: Response, fileId: string): Promise<void> {
+    try {
+      const fileObj = await this.fileRepository.findOne(fileId);
+      const path = `${BUCKET_DIRECTORY}/${fileObj.filenameOnBucket}`;
+      res.download(path);
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }
