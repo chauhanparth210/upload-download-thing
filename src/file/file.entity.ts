@@ -15,11 +15,13 @@ export class FileEntity {
   @Column()
   filename!: string;
 
+  @Column({
+    unique: true,
+  })
+  filenameOnBucket!: string;
+
   @Column()
   mimetype!: string;
-
-  @Column({ nullable: true })
-  location: string;
 
   @Column({
     type: "enum",

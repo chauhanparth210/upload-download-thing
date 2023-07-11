@@ -38,9 +38,11 @@ export class FileService {
       }
 
       // save the file metadata
+      const filenameOnBucket = `${new Date().getTime()}_${filename}`;
       const fileDetails = this.fileRepository.create({
         filename,
         mimetype,
+        filenameOnBucket,
       });
       await this.fileRepository.insert(fileDetails);
       const fileId = fileDetails.id;
@@ -48,7 +50,7 @@ export class FileService {
       const fileReadStream = createReadStream();
       this.uploadService.storeFile({
         fileReadStream,
-        filename,
+        filename: filenameOnBucket,
         fileId,
       });
 
