@@ -1,3 +1,5 @@
+import { SUPPORTED_MAX_FILE_SIZE } from "src/config";
+
 export const BUCKET_DIRECTORY = "file_bucket";
 
 export enum UPLOAD_TYPE {
@@ -6,4 +8,4 @@ export enum UPLOAD_TYPE {
   COMPLETED = "completed",
 }
 
-export const BIG_FILE_SIZE_ERROR_MESSAGE = "file size was big";
+export const BIG_FILE_SIZE_ERROR_MESSAGE = `file size was exceeded more than ${SUPPORTED_MAX_FILE_SIZE}MBs`;
