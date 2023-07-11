@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { BIG_FILE_SIZE_ERROR_MESSAGE, UPLOAD_TYPE } from "src/constants";
 import { getFilePath } from "src/utils";
 import * as fs from "fs";
-import { SUPPORTED_MAX_FILE_SIZE } from "src/config";
+import { SUPPORTED_MAX_FILE_SIZE_IN_BYTES } from "src/config";
 import { Repository } from "typeorm";
 import { FileEntity } from "src/file/file.entity";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -38,7 +38,7 @@ export class UploadService {
       fileReadStream
         .on("data", (data: Buffer) => {
           byteLength += data.length;
-          if (byteLength > SUPPORTED_MAX_FILE_SIZE) {
+          if (byteLength > SUPPORTED_MAX_FILE_SIZE_IN_BYTES) {
             this.fileRepository.update(
               { id: fileId },
               {
