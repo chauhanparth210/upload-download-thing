@@ -3,10 +3,9 @@ import { UploadService } from "./upload.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { FileEntity } from "src/file/file.entity";
 import * as fs from "fs";
-import { WriteStream, ReadStream } from "fs-capacitor";
+import { WriteStream } from "fs-capacitor";
 import { BIG_FILE_SIZE_ERROR_MESSAGE, UPLOAD_TYPE } from "src/constants";
 import { mocked } from "ts-jest/utils";
-import exp from "constants";
 
 jest.mock("fs");
 jest.mock("src/utils", () => ({
@@ -76,7 +75,6 @@ describe("UploadService", () => {
       {
         uploadingStatus: UPLOAD_TYPE.COMPLETED,
         size: 10,
-        location: "temp/git-cheatsheet.pdf",
       }
     );
   });
