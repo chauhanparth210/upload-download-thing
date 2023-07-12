@@ -13,7 +13,7 @@ jest.mock("src/utils", () => ({
   createDirIfNotExists: () => {},
 }));
 jest.mock("src/config", () => ({
-  SUPPORTED_MAX_FILE_SIZE: 10,
+  SUPPORTED_MAX_FILE_SIZE_IN_BYTES: 10,
 }));
 
 describe("UploadService", () => {
