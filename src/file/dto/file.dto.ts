@@ -25,6 +25,9 @@ export class FileDTO {
   @Field({ nullable: true })
   reasonOfFailure: string;
 
+  @Field({ nullable: true })
+  downloadLink: string;
+
   @Field(() => GraphQLISODateTime)
   created!: Date;
 

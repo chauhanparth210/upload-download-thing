@@ -25,6 +25,9 @@ SUPPORTED_FILE_FORMATS=application/pdf,image/jpeg,image/png,audio/mpeg,video/mp4
 
 # supported max file size (should be in MBs)
 SUPPORTED_MAX_FILE_SIZE=10
+
+# app base url
+BASE_URL=http://localhost:3000
 ```
 
 ## Running the app
