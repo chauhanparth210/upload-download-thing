@@ -16,6 +16,9 @@ export class FileDTO {
   @Field({ nullable: true })
   location: string;
 
+  @Field({ nullable: true })
+  filenameOnBucket: string;
+
   @FilterableField()
   uploadingStatus!: UPLOAD_TYPE;
 

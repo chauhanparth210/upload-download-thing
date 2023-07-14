@@ -39,6 +39,7 @@ type file {
   filename: String!
   mimetype: String!
   location: String
+  filenameOnBucket: String
   uploadingStatus: String!
   size: Float
   reasonOfFailure: String
