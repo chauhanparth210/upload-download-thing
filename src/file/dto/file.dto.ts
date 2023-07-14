@@ -14,9 +14,6 @@ export class FileDTO {
   mimetype!: string;
 
   @Field({ nullable: true })
-  location: string;
-
-  @Field({ nullable: true })
   filenameOnBucket: string;
 
   @FilterableField()

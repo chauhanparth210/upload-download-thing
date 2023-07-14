@@ -2,30 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-"""
-Cursor for paging through collections
-"""
+"""Cursor for paging through collections"""
 scalar ConnectionCursor
 
 input CursorPaging {
-  """
-  Paginate before opaque cursor
-  """
+  """Paginate before opaque cursor"""
   before: ConnectionCursor
 
-  """
-  Paginate after opaque cursor
-  """
+  """Paginate after opaque cursor"""
   after: ConnectionCursor
 
-  """
-  Paginate first
-  """
+  """Paginate first"""
   first: Int
 
-  """
-  Paginate last
-  """
+  """Paginate last"""
   last: Int
 }
 
@@ -38,7 +28,6 @@ type file {
   id: ID!
   filename: String!
   mimetype: String!
-  location: String
   filenameOnBucket: String
   uploadingStatus: String!
   size: Float
@@ -55,14 +44,10 @@ type fileAggregateGroupBy {
 }
 
 type FileConnection {
-  """
-  Paging information
-  """
+  """Paging information"""
   pageInfo: PageInfo!
 
-  """
-  Array of edges.
-  """
+  """Array of edges."""
   edges: [fileEdge!]!
 }
 
@@ -73,14 +58,10 @@ type fileCountAggregate {
 }
 
 type fileEdge {
-  """
-  The node containing the file
-  """
+  """The node containing the file"""
   node: file!
 
-  """
-  Cursor for this node.
-  """
+  """Cursor for this node."""
   cursor: ConnectionCursor!
 }
 
@@ -138,64 +119,44 @@ type Mutation {
 }
 
 type PageInfo {
-  """
-  true if paging forward and there are more records.
-  """
+  """true if paging forward and there are more records."""
   hasNextPage: Boolean
 
-  """
-  true if paging backwards and there are more records.
-  """
+  """true if paging backwards and there are more records."""
   hasPreviousPage: Boolean
 
-  """
-  The cursor of the first returned record.
-  """
+  """The cursor of the first returned record."""
   startCursor: ConnectionCursor
 
-  """
-  The cursor of the last returned record.
-  """
+  """The cursor of the last returned record."""
   endCursor: ConnectionCursor
 }
 
 type Query {
   getHello: String!
   file(
-    """
-    The id of the record to find.
-    """
+    """The id of the record to find."""
     id: ID!
   ): file
   files(
-    """
-    Limit or page results.
-    """
-    paging: CursorPaging = { first: 10 }
+    """Limit or page results."""
+    paging: CursorPaging = {first: 10}
 
-    """
-    Specify to filter the records returned.
-    """
+    """Specify to filter the records returned."""
     filter: fileFilter = {}
 
-    """
-    Specify to sort results.
-    """
+    """Specify to sort results."""
     sorting: [fileSort!] = []
   ): FileConnection!
 }
 
-"""
-Sort Directions
-"""
+"""Sort Directions"""
 enum SortDirection {
   ASC
   DESC
 }
 
-"""
-Sort Nulls Options
-"""
+"""Sort Nulls Options"""
 enum SortNulls {
   NULLS_FIRST
   NULLS_LAST
@@ -218,9 +179,7 @@ input StringFieldComparison {
   notIn: [String!]
 }
 
-"""
-The `Upload` scalar type represents a file upload.
-"""
+"""The `Upload` scalar type represents a file upload."""
 scalar Upload
 
 type UploadFileResponse {
