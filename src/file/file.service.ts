@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnsupportedMediaTypeException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -9,7 +11,10 @@ import { Repository } from "typeorm";
 import { UploadService } from "src/upload/upload.service";
 import { SUPPORTED_FILE_FORMATS } from "src/config";
 import { FileUpload } from "graphql-upload";
-import { UploadFileResponse } from "./upload-file.response";
+import { UploadFileResponse } from "./dto/upload-file.response";
+import { DeleteFileResponse } from "./dto/delete-file.response";
+import * as fs from "fs/promises";
+import { getFilePath } from "src/utils";
 
 @Injectable()
 export class FileService {
@@ -60,6 +65,39 @@ export class FileService {
       };
     } catch (error) {
       throw new InternalServerErrorException(error);
+    }
+  }
+
+  /**
+   * Function to delete a file details from database and from bucket
+   * @param fileId uuid from that file
+   * @returns {Promise<DeleteFileResponse>}
+   */
+  async deleteFile(fileId: string): Promise<DeleteFileResponse> {
+    try {
+      const queryManager = this.fileRepository.manager;
+      const query = `
+        DELETE FROM file
+        WHERE id = '${fileId}'
+        RETURNING *
+      `;
+      const rawData = await queryManager.query(query);
+      const deletedFileDetails: FileEntity = rawData[0][0];
+      if (deletedFileDetails?.id) {
+        const filenameOnBucket = deletedFileDetails?.filenameOnBucket;
+        const filename = deletedFileDetails?.filename;
+        const filePath = getFilePath(filenameOnBucket);
+        await fs.unlink(filePath);
+        return {
+          message: `${filename} is successfully deleted!!`,
+        };
+      } else {
+        throw new NotFoundException(
+          `File details does not found associate with this ${fileId} uuid!!`
+        );
+      }
+    } catch (error) {
+      throw new BadRequestException(error?.message);
     }
   }
 }

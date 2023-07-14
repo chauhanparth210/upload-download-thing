@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { FileService } from "./file.service";
-import { UploadFileResponse } from "./upload-file.response";
+import { UploadFileResponse } from "./dto/upload-file.response";
 import { FileUpload } from "graphql-upload";
 import { UploadService } from "src/upload/upload.service";
 import { getRepositoryToken } from "@nestjs/typeorm";

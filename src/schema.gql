@@ -2,15 +2,152 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""
+Cursor for paging through collections
+"""
+scalar ConnectionCursor
+
+input CursorPaging {
+  """
+  Paginate before opaque cursor
+  """
+  before: ConnectionCursor
+
+  """
+  Paginate after opaque cursor
+  """
+  after: ConnectionCursor
+
+  """
+  Paginate first
+  """
+  first: Int
+
+  """
+  Paginate last
+  """
+  last: Int
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type DeleteFileResponse {
+  message: String
+}
+
+type file {
+  id: ID!
+  filename: String!
+  mimetype: String!
+  filenameOnBucket: String
+  uploadingStatus: String!
+  size: Float
+  reasonOfFailure: String
+  downloadLink: String
+  created: DateTime!
+  updated: DateTime!
+}
+
+type fileAggregateGroupBy {
+  id: ID
+  filename: String
+  uploadingStatus: String
+}
+
+type FileConnection {
+  """
+  Paging information
+  """
+  pageInfo: PageInfo!
+
+  """
+  Array of edges.
+  """
+  edges: [fileEdge!]!
+}
+
+type fileCountAggregate {
+  id: Int
+  filename: Int
+  uploadingStatus: Int
+}
+
+type fileEdge {
+  """
+  The node containing the file
+  """
+  node: file!
+
+  """
+  Cursor for this node.
+  """
+  cursor: ConnectionCursor!
+}
+
+input fileFilter {
+  and: [fileFilter!]
+  or: [fileFilter!]
+  id: IDFilterComparison
+  filename: StringFieldComparison
+  uploadingStatus: StringFieldComparison
+}
+
+type fileMaxAggregate {
+  id: ID
+  filename: String
+  uploadingStatus: String
+}
+
+type fileMinAggregate {
+  id: ID
+  filename: String
+  uploadingStatus: String
+}
+
+input fileSort {
+  field: fileSortFields!
+  direction: SortDirection!
+  nulls: SortNulls
+}
+
+enum fileSortFields {
+  id
+  filename
+  uploadingStatus
+}
+
+input IDFilterComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: ID
+  neq: ID
+  gt: ID
+  gte: ID
+  lt: ID
+  lte: ID
+  like: ID
+  notLike: ID
+  iLike: ID
+  notILike: ID
+  in: [ID!]
+  notIn: [ID!]
+}
+
 type Mutation {
   uploadFile(file: Upload!): UploadFileResponse!
+  deleteFile(fileId: ID!): DeleteFileResponse!
 }
 
 type Query {
   getHello: String!
 }
 
-"""The `Upload` scalar type represents a file upload."""
+"""
+The `Upload` scalar type represents a file upload.
+"""
 scalar Upload
 
 type UploadFileResponse {
