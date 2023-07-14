@@ -2,7 +2,6 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { DownloadController } from "./download.controller";
 import { DownloadService } from "./download.service";
 import { response } from "express";
-import { UPLOAD_TYPE } from "src/constants";
 
 describe("DownloadController", () => {
   let controller: DownloadController;
@@ -36,7 +35,7 @@ describe("DownloadController", () => {
     expect(controller).toBeDefined();
   });
 
-  it("should call download service", () => {
+  it("should call downloadFile method from download service", () => {
     controller.downloadFile(response, fileID);
 
     (downloadService.downloadFile as jest.Mock).mockReturnThis();

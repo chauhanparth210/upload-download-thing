@@ -15,6 +15,12 @@ export class DownloadService {
     @InjectRepository(FileEntity)
     private readonly fileRepository: Repository<FileEntity>
   ) {}
+
+  /**
+   * Function to download a file
+   * @param res Response of a request
+   * @param fileId unique fileId
+   */
   async downloadFile(res: Response, fileId: string): Promise<void> {
     try {
       const fileObj = await this.fileRepository.findOne(fileId);
