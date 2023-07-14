@@ -9,6 +9,11 @@ export class FileAssembler extends ClassTransformerAssembler<
   FileDTO,
   FileEntity
 > {
+  /**
+   * Convert FileEntity into proper FileDTO format
+   * Here we are using to construct downloadLink field based upon avaliable entity data
+   * else other mapping remains the same
+   */
   convertToDTO(entity: FileEntity): FileDTO {
     const dto = new FileDTO();
     dto.id = entity.id;
