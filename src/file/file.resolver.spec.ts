@@ -61,7 +61,7 @@ describe("FileResolver", () => {
 
   describe("deleteFile mutation", () => {
     it("should return the response from uploadFile mutation", async () => {
-      const fileDetails = {
+      const FileDetails = {
         mimetype: "application/pdf",
         filenameOnBucket: "1689312279585_git-cheatsheet.pdf",
         uploadingStatus: "completed",
@@ -72,14 +72,14 @@ describe("FileResolver", () => {
       };
 
       const FileResponse = {
-        message: `${fileDetails.filename} is successfully deleted!!`,
+        message: `${FileDetails.filename} is successfully deleted!!`,
       };
 
       (fileService.deleteFile as jest.Mock).mockResolvedValue(FileResponse);
 
-      const response = await fileResolver.deleteFile(fileDetails.id);
+      const response = await fileResolver.deleteFile(FileDetails.id);
       expect(fileService.deleteFile).toBeCalledTimes(1);
-      expect(fileService.deleteFile).toBeCalledWith(fileDetails.id);
+      expect(fileService.deleteFile).toBeCalledWith(FileDetails.id);
       expect(response).toEqual(FileResponse);
     });
   });

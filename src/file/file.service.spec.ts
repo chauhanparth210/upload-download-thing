@@ -29,7 +29,7 @@ describe("FileService", () => {
     },
   };
 
-  const fileDetails = {
+  const FileDetails = {
     mimetype: "application/pdf",
     filenameOnBucket: "1689312279585_git-cheatsheet.pdf",
     uploadingStatus: "completed",
@@ -117,7 +117,7 @@ describe("FileService", () => {
 
       jest
         .spyOn(fileRepository.manager, "query")
-        .mockReturnValue([[fileDetails]]);
+        .mockReturnValue([[FileDetails]]);
 
       const response = await fileService.deleteFile(fileId);
 
@@ -126,10 +126,10 @@ describe("FileService", () => {
       );
       expect(fs.unlink).toBeCalledTimes(1);
       expect(fs.unlink).toBeCalledWith(
-        `file_bucket/${fileDetails.filenameOnBucket}`
+        `file_bucket/${FileDetails.filenameOnBucket}`
       );
       expect(response).toMatchObject({
-        message: `${fileDetails.filename} is successfully deleted!!`,
+        message: `${FileDetails.filename} is successfully deleted!!`,
       });
     });
 
