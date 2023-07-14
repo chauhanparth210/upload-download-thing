@@ -19,6 +19,12 @@ POSTGRES_USER
 POSTGRES_PASSWORD
 POSTGRES_DB
 APPLICATION_PORT
+
+# supported file formats
+SUPPORTED_FILE_FORMATS=application/pdf,image/jpeg,image/png,audio/mpeg,video/mp4
+
+# supported max file size (should be in MBs)
+SUPPORTED_MAX_FILE_SIZE=10
 ```
 
 ## Running the app
