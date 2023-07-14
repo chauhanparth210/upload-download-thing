@@ -76,12 +76,8 @@ export class FileService {
   async deleteFile(fileId: string): Promise<DeleteFileResponse> {
     try {
       const queryManager = this.fileRepository.manager;
-      const query = `
-        DELETE FROM file
-        WHERE id = '${fileId}'
-        RETURNING *
-      `;
-      const rawData = await queryManager.query(query);
+      const deleteFileDetailsQuery = `DELETE FROM file WHERE id = '${fileId}' RETURNING *`;
+      const rawData = await queryManager.query(deleteFileDetailsQuery);
       const deletedFileDetails: FileEntity = rawData[0][0];
       if (deletedFileDetails?.id) {
         const filenameOnBucket = deletedFileDetails?.filenameOnBucket;
