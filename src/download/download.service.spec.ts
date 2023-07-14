@@ -2,19 +2,9 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { DownloadService } from "./download.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { FileEntity } from "src/file/file.entity";
-import {
-  BUCKET_DIRECTORY,
-  FILE_FAILED_MESSAGE,
-  FILE_UPLOADING_MESSAGE,
-  UPLOAD_TYPE,
-} from "src/constants";
+import { BUCKET_DIRECTORY, MESSAGE, UPLOAD_TYPE } from "src/constants";
 import { response } from "express";
-import {
-  BadRequestException,
-  InternalServerErrorException,
-  NotFoundException,
-} from "@nestjs/common";
-import { async } from "rxjs/internal/scheduler/async";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 
 describe("DownloadService", () => {
   let downloadService: DownloadService;
@@ -82,7 +72,7 @@ describe("DownloadService", () => {
     expect(fileRepository.findOne).toBeCalledWith(fileID);
     expect(response.json).toBeCalledTimes(1);
     expect(response.json).toBeCalledWith({
-      message: FILE_UPLOADING_MESSAGE,
+      message: MESSAGE.FILE_UPLOADING,
     });
   });
 
@@ -103,7 +93,7 @@ describe("DownloadService", () => {
     expect(fileRepository.findOne).toBeCalledWith(fileID);
     expect(response.json).toBeCalledTimes(1);
     expect(response.json).toBeCalledWith({
-      message: FILE_FAILED_MESSAGE,
+      message: MESSAGE.FILE_UPLOAD_FAILED,
       reason: reasonOfFailure,
     });
   });
@@ -126,6 +116,6 @@ describe("DownloadService", () => {
 
     await expect(
       downloadService.downloadFile(response, fileID)
-    ).rejects.toThrow(new NotFoundException("File not found !!"));
+    ).rejects.toThrow(new NotFoundException(MESSAGE.FILE_NOT_FOUND));
   });
 });

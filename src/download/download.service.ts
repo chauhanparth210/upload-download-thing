@@ -7,13 +7,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import type { Response } from "express";
 import { FileEntity } from "src/file/file.entity";
 import { Repository } from "typeorm";
-import {
-  BUCKET_DIRECTORY,
-  FILE_FAILED_MESSAGE,
-  FILE_NOT_FOUND_MESSAGE,
-  FILE_UPLOADING_MESSAGE,
-  UPLOAD_TYPE,
-} from "src/constants";
+import { BUCKET_DIRECTORY, MESSAGE, UPLOAD_TYPE } from "src/constants";
 
 @Injectable()
 export class DownloadService {
@@ -33,19 +27,19 @@ export class DownloadService {
 
         case UPLOAD_TYPE.UPLOADING:
           res.json({
-            message: FILE_UPLOADING_MESSAGE,
+            message: MESSAGE.FILE_UPLOADING,
           });
           break;
 
         case UPLOAD_TYPE.FAILED:
           res.json({
-            message: FILE_FAILED_MESSAGE,
+            message: MESSAGE.FILE_UPLOAD_FAILED,
             reason: fileObj.reasonOfFailure,
           });
           break;
 
         default:
-          throw new NotFoundException("File not found !!");
+          throw new NotFoundException(MESSAGE.FILE_NOT_FOUND);
       }
     } catch (error) {
       throw new BadRequestException(error?.message);

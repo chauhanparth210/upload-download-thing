@@ -8,10 +8,9 @@ export enum UPLOAD_TYPE {
   COMPLETED = "completed",
 }
 
-export const BIG_FILE_SIZE_ERROR_MESSAGE = `File size was exceeded more than ${SUPPORTED_MAX_FILE_SIZE}MBs`;
-
-export const FILE_UPLOADING_MESSAGE = "Stay hang with us, file is uploading...";
-
-export const FILE_FAILED_MESSAGE = "File was failed to upload";
-
-export const FILE_NOT_FOUND_MESSAGE = "File is not found !!";
+export const MESSAGE = {
+  FILE_UPLOADING: "Stay hang with us, file is uploading...",
+  FILE_UPLOAD_FAILED: "File was failed to upload",
+  FILE_NOT_FOUND: "File is not found !!",
+  BIG_FILE_SIZE: `File size was exceeded more than ${SUPPORTED_MAX_FILE_SIZE}MBs`,
+};
