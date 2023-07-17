@@ -8,6 +8,20 @@ const mockResponseFromFileRepository = {
   filename: "git-cheatsheet.pdf",
 };
 
+const mockFile = {
+  filename: "git-cheatsheet.pdf",
+  mimetype: "application/pdf",
+  encoding: "",
+  createReadStream: jest.fn(),
+};
+
+const notSupportedMockFile = {
+  filename: "my_photo.jpeg",
+  mimetype: "image/jpeg",
+  encoding: "",
+  createReadStream: jest.fn(),
+};
+
 const fileId = "3dd6d207-066c-42e5-bbed-f40ce7355941";
 
 const fileNotAssociatedWithUUID = "5bc6d207-066c-42e5-bbed-f40ce7355234";
@@ -15,7 +29,12 @@ const fileNotAssociatedWithUUID = "5bc6d207-066c-42e5-bbed-f40ce7355234";
 const invalidFileId = "invalid_fileId";
 
 const mockResponseFromDeleteFileMutation = {
-  message: `${mockResponseFromFileRepository.filename} is successfully deleted!!`,
+  message: `${mockFile.filename} is successfully deleted!!`,
+};
+
+const mockResponseFromUploadFileMuation = {
+  fileId,
+  message: `${mockFile.filename} file is uploading...`,
 };
 
 export const MOCK_DATA = {
@@ -24,4 +43,7 @@ export const MOCK_DATA = {
   fileNotAssociatedWithUUID,
   invalidFileId,
   mockResponseFromDeleteFileMutation,
+  mockFile,
+  mockResponseFromUploadFileMuation,
+  notSupportedMockFile,
 };

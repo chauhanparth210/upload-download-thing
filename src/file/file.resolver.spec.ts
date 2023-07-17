@@ -39,24 +39,14 @@ describe("FileResolver", () => {
 
   describe("uploadFile mutation", () => {
     it("should return the response from uploadFile mutation", async () => {
-      const FileInput = {
-        filename: "git-cheatsheet.pdf",
-        mimetype: "application/pdf",
-        encoding: "",
-        createReadStream: jest.fn(),
-      };
+      (fileService.uploadFile as jest.Mock).mockResolvedValue(
+        MOCK_DATA.mockResponseFromUploadFileMuation
+      );
 
-      const FileResponse = {
-        fileId: "3dd6d207-066c-42e5-bbed-f40ce7355941",
-        message: "git-cheatsheet.pdf file is uploading...",
-      };
-
-      (fileService.uploadFile as jest.Mock).mockResolvedValue(FileResponse);
-
-      const response = await fileResolver.uploadFile(FileInput);
+      const response = await fileResolver.uploadFile(MOCK_DATA.mockFile);
       expect(fileService.uploadFile).toBeCalledTimes(1);
-      expect(fileService.uploadFile).toBeCalledWith(FileInput);
-      expect(response).toEqual(FileResponse);
+      expect(fileService.uploadFile).toBeCalledWith(MOCK_DATA.mockFile);
+      expect(response).toEqual(MOCK_DATA.mockResponseFromUploadFileMuation);
     });
   });
 

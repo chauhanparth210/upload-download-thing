@@ -1,7 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { FileService } from "./file.service";
-import { UploadFileResponse } from "./dto/upload-file.response";
-import { FileUpload } from "graphql-upload";
 import { UploadService } from "src/upload/upload.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { FileEntity } from "./file.entity";
@@ -54,42 +52,25 @@ describe("FileService", () => {
 
   describe("uploadFile mutation", () => {
     it("should return success response while uploading supported file", async () => {
-      const mockResponse: UploadFileResponse = {
-        fileId: "3dd6d207-066c-42e5-bbed-f40ce7355941",
-        message: "git-cheatsheet.pdf file is uploading...",
-      };
-
-      const FileInput: FileUpload = {
-        filename: "git-cheatsheet.pdf",
-        mimetype: "application/pdf",
-        encoding: "",
-        createReadStream: jest.fn(),
-      };
-
       jest.spyOn(mockFileRepository, "create").mockReturnValue({
-        id: "3dd6d207-066c-42e5-bbed-f40ce7355941",
+        id: MOCK_DATA.fileId,
       });
 
-      const response = await fileService.uploadFile(FileInput);
+      const response = await fileService.uploadFile(MOCK_DATA.mockFile);
 
-      expect(response).toEqual(mockResponse);
+      expect(response).toEqual(MOCK_DATA.mockResponseFromUploadFileMuation);
       expect(mockFileRepository.create).toBeCalledTimes(1);
       expect(mockFileRepository.insert).toBeCalledTimes(1);
-      expect(FileInput.createReadStream).toBeCalledTimes(1);
+      expect(MOCK_DATA.mockFile.createReadStream).toBeCalledTimes(1);
       expect(uploadService.storeFile).toBeCalledTimes(1);
     });
 
     it("should return UnsupportedMediaType exception while uploading unsupported file", async () => {
-      const FileInput: FileUpload = {
-        filename: "my_photo.jpeg",
-        mimetype: "image/jpeg",
-        encoding: "",
-        createReadStream: jest.fn(),
-      };
-
-      await expect(fileService.uploadFile(FileInput)).rejects.toThrow(
+      await expect(
+        fileService.uploadFile(MOCK_DATA.notSupportedMockFile)
+      ).rejects.toThrow(
         new UnsupportedMediaTypeException(
-          `${FileInput.mimetype} file type is not supported`
+          `${MOCK_DATA.notSupportedMockFile.mimetype} file type is not supported`
         )
       );
     });
