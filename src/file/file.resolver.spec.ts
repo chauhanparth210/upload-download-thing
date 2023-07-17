@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { FileResolver } from "./file.resolver";
 import { FileService } from "./file.service";
+import { MOCK_DATA } from "./mock";
 
 jest.mock("src/config", () => ({
   SUPPORTED_FILE_FORMATS: ["application/pdf"],
@@ -61,26 +62,14 @@ describe("FileResolver", () => {
 
   describe("deleteFile mutation", () => {
     it("should return the response from uploadFile mutation", async () => {
-      const FileDetails = {
-        mimetype: "application/pdf",
-        filenameOnBucket: "1689312279585_git-cheatsheet.pdf",
-        uploadingStatus: "completed",
-        size: 100194,
-        reasonOfFailure: null,
-        id: "3dd6d207-066c-42e5-bbed-f40ce7355941",
-        filename: "git-cheatsheet.pdf",
-      };
+      (fileService.deleteFile as jest.Mock).mockResolvedValue(
+        MOCK_DATA.mockResponseFromDeleteFileMutation
+      );
 
-      const FileResponse = {
-        message: `${FileDetails.filename} is successfully deleted!!`,
-      };
-
-      (fileService.deleteFile as jest.Mock).mockResolvedValue(FileResponse);
-
-      const response = await fileResolver.deleteFile(FileDetails.id);
+      const response = await fileResolver.deleteFile(MOCK_DATA.fileId);
       expect(fileService.deleteFile).toBeCalledTimes(1);
-      expect(fileService.deleteFile).toBeCalledWith(FileDetails.id);
-      expect(response).toEqual(FileResponse);
+      expect(fileService.deleteFile).toBeCalledWith(MOCK_DATA.fileId);
+      expect(response).toEqual(MOCK_DATA.mockResponseFromDeleteFileMutation);
     });
   });
 });

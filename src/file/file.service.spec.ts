@@ -11,6 +11,8 @@ import {
   UnsupportedMediaTypeException,
 } from "@nestjs/common";
 import * as fs from "fs/promises";
+import { MOCK_DATA } from "./mock";
+import { mockFileRepository } from "src/__mocks__";
 
 jest.mock("fs/promises");
 jest.mock("src/config", () => ({
@@ -21,30 +23,12 @@ describe("FileService", () => {
   let fileService: FileService;
   let uploadService: UploadService;
 
-  const fileRepository = {
-    create: jest.fn(),
-    insert: jest.fn(),
-    manager: {
-      query: jest.fn(),
-    },
-  };
-
-  const FileDetails = {
-    mimetype: "application/pdf",
-    filenameOnBucket: "1689312279585_git-cheatsheet.pdf",
-    uploadingStatus: "completed",
-    size: 100194,
-    reasonOfFailure: null,
-    id: "3dd6d207-066c-42e5-bbed-f40ce7355941",
-    filename: "git-cheatsheet.pdf",
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         {
           provide: getRepositoryToken(FileEntity),
-          useValue: fileRepository,
+          useValue: mockFileRepository,
         },
         FileService,
         {
@@ -82,15 +66,15 @@ describe("FileService", () => {
         createReadStream: jest.fn(),
       };
 
-      jest.spyOn(fileRepository, "create").mockReturnValue({
+      jest.spyOn(mockFileRepository, "create").mockReturnValue({
         id: "3dd6d207-066c-42e5-bbed-f40ce7355941",
       });
 
       const response = await fileService.uploadFile(FileInput);
 
       expect(response).toEqual(mockResponse);
-      expect(fileRepository.create).toBeCalledTimes(1);
-      expect(fileRepository.insert).toBeCalledTimes(1);
+      expect(mockFileRepository.create).toBeCalledTimes(1);
+      expect(mockFileRepository.insert).toBeCalledTimes(1);
       expect(FileInput.createReadStream).toBeCalledTimes(1);
       expect(uploadService.storeFile).toBeCalledTimes(1);
     });
@@ -113,46 +97,42 @@ describe("FileService", () => {
 
   describe("deleteFile mutation", () => {
     it("should return success response when file successfully deleted", async () => {
-      const fileId = "3dd6d207-066c-42e5-bbed-f40ce7355941";
-
       jest
-        .spyOn(fileRepository.manager, "query")
-        .mockReturnValue([[FileDetails]]);
+        .spyOn(mockFileRepository.manager, "query")
+        .mockReturnValue([[MOCK_DATA.mockResponseFromFileRepository]]);
 
-      const response = await fileService.deleteFile(fileId);
+      const response = await fileService.deleteFile(MOCK_DATA.fileId);
 
-      expect(fileRepository.manager.query).toBeCalledWith(
-        `DELETE FROM file WHERE id = '${fileId}' RETURNING *`
+      expect(mockFileRepository.manager.query).toBeCalledWith(
+        `DELETE FROM file WHERE id = '${MOCK_DATA.fileId}' RETURNING *`
       );
       expect(fs.unlink).toBeCalledTimes(1);
       expect(fs.unlink).toBeCalledWith(
-        `file_bucket/${FileDetails.filenameOnBucket}`
+        `file_bucket/${MOCK_DATA.mockResponseFromFileRepository.filenameOnBucket}`
       );
       expect(response).toMatchObject({
-        message: `${FileDetails.filename} is successfully deleted!!`,
+        message: `${MOCK_DATA.mockResponseFromFileRepository.filename} is successfully deleted!!`,
       });
     });
 
     it("should return NotFoundException when file details is not found in database", async () => {
-      const fileId = "5bc6d207-066c-42e5-bbed-f40ce7355234";
+      jest.spyOn(mockFileRepository.manager, "query").mockReturnValue([[]]);
 
-      jest.spyOn(fileRepository.manager, "query").mockReturnValue([[]]);
-
-      await expect(fileService.deleteFile(fileId)).rejects.toThrow(
+      await expect(
+        fileService.deleteFile(MOCK_DATA.fileNotAssociatedWithUUID)
+      ).rejects.toThrow(
         new NotFoundException(
-          `File details does not found associate with this ${fileId} uuid!!`
+          `File details does not found associate with this ${MOCK_DATA.fileNotAssociatedWithUUID} uuid!!`
         )
       );
     });
 
     it("should return BadRequestException when fileId is not valid uuid", async () => {
-      const fileId = "invalid_UUID";
+      (mockFileRepository.manager.query as jest.Mock).mockRejectedValue(null);
 
-      (fileRepository.manager.query as jest.Mock).mockRejectedValue(null);
-
-      await expect(fileService.deleteFile(fileId)).rejects.toThrow(
-        new BadRequestException()
-      );
+      await expect(
+        fileService.deleteFile(MOCK_DATA.invalidFileId)
+      ).rejects.toThrow(new BadRequestException());
     });
   });
 });
