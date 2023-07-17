@@ -2,13 +2,11 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { DownloadController } from "./download.controller";
 import { DownloadService } from "./download.service";
 import { response } from "express";
+import { MOCK_DATA } from "./mock";
 
 describe("DownloadController", () => {
   let controller: DownloadController;
   let downloadService: DownloadService;
-
-  const fileID = "3dd6d207-066c-42e5-bbed-f40ce7355941";
-  const fileName = "git-cheatsheet.pdf";
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -36,11 +34,14 @@ describe("DownloadController", () => {
   });
 
   it("should call downloadFile method from download service", () => {
-    controller.downloadFile(response, fileID);
+    controller.downloadFile(response, MOCK_DATA.fileId);
 
     (downloadService.downloadFile as jest.Mock).mockReturnThis();
 
     expect(downloadService.downloadFile).toBeCalledTimes(1);
-    expect(downloadService.downloadFile).toBeCalledWith(response, fileID);
+    expect(downloadService.downloadFile).toBeCalledWith(
+      response,
+      MOCK_DATA.fileId
+    );
   });
 });

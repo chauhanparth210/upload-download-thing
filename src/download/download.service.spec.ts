@@ -5,16 +5,11 @@ import { FileEntity } from "src/file/file.entity";
 import { BUCKET_DIRECTORY, MESSAGE, UPLOAD_TYPE } from "src/constants";
 import { response } from "express";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { mockFileRepository } from "src/__mocks__";
+import { MOCK_DATA } from "./mock";
 
 describe("DownloadService", () => {
   let downloadService: DownloadService;
-
-  const fileRepository = {
-    findOne: jest.fn(),
-  };
-
-  const fileID = "3dd6d207-066c-42e5-bbed-f40ce7355941";
-  const fileName = "git-cheatsheet.pdf";
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -25,7 +20,7 @@ describe("DownloadService", () => {
       providers: [
         {
           provide: getRepositoryToken(FileEntity),
-          useValue: fileRepository,
+          useValue: mockFileRepository,
         },
         DownloadService,
       ],
@@ -39,37 +34,35 @@ describe("DownloadService", () => {
   });
 
   it("should call the download method in successful file upload", async () => {
-    const filenameOnBucket = `${new Date().getTime()}_${fileName}`;
     const uploadingStatus = UPLOAD_TYPE.COMPLETED;
 
-    jest.spyOn(fileRepository, "findOne").mockReturnValue({
-      filenameOnBucket,
+    jest.spyOn(mockFileRepository, "findOne").mockReturnValue({
+      filenameOnBucket: MOCK_DATA.filenameOnBucket,
       uploadingStatus,
     });
     jest.spyOn(response, "download").mockReturnThis();
 
-    await downloadService.downloadFile(response, fileID);
+    await downloadService.downloadFile(response, MOCK_DATA.fileId);
 
-    expect(fileRepository.findOne).toBeCalledWith(fileID);
+    expect(mockFileRepository.findOne).toBeCalledWith(MOCK_DATA.fileId);
     expect(response.download).toBeCalledTimes(1);
     expect(response.download).toBeCalledWith(
-      `${BUCKET_DIRECTORY}/${filenameOnBucket}`
+      `${BUCKET_DIRECTORY}/${MOCK_DATA.filenameOnBucket}`
     );
   });
 
   it("should call the send method with proper message when file is uploading", async () => {
-    const filenameOnBucket = `${new Date().getTime()}_${fileName}`;
     const uploadingStatus = UPLOAD_TYPE.UPLOADING;
 
-    jest.spyOn(fileRepository, "findOne").mockReturnValue({
-      filenameOnBucket,
+    jest.spyOn(mockFileRepository, "findOne").mockReturnValue({
+      filenameOnBucket: MOCK_DATA.filenameOnBucket,
       uploadingStatus,
     });
     jest.spyOn(response, "json").mockReturnThis();
 
-    await downloadService.downloadFile(response, fileID);
+    await downloadService.downloadFile(response, MOCK_DATA.fileId);
 
-    expect(fileRepository.findOne).toBeCalledWith(fileID);
+    expect(mockFileRepository.findOne).toBeCalledWith(MOCK_DATA.fileId);
     expect(response.json).toBeCalledTimes(1);
     expect(response.json).toBeCalledWith({
       message: MESSAGE.FILE_UPLOADING,
@@ -77,45 +70,42 @@ describe("DownloadService", () => {
   });
 
   it("should call the send method with appropriate message when file was failed to upload", async () => {
-    const filenameOnBucket = `${new Date().getTime()}_${fileName}`;
     const uploadingStatus = UPLOAD_TYPE.FAILED;
-    const reasonOfFailure = "File was failed to upload";
 
-    jest.spyOn(fileRepository, "findOne").mockReturnValue({
-      filenameOnBucket,
+    jest.spyOn(mockFileRepository, "findOne").mockReturnValue({
+      filenameOnBucket: MOCK_DATA.filenameOnBucket,
       uploadingStatus,
-      reasonOfFailure,
+      reasonOfFailure: MESSAGE.FILE_UPLOAD_FAILED,
     });
     jest.spyOn(response, "json").mockReturnThis();
 
-    await downloadService.downloadFile(response, fileID);
+    await downloadService.downloadFile(response, MOCK_DATA.fileId);
 
-    expect(fileRepository.findOne).toBeCalledWith(fileID);
+    expect(mockFileRepository.findOne).toBeCalledWith(MOCK_DATA.fileId);
     expect(response.json).toBeCalledTimes(1);
     expect(response.json).toBeCalledWith({
       message: MESSAGE.FILE_UPLOAD_FAILED,
-      reason: reasonOfFailure,
+      reason: MESSAGE.FILE_UPLOAD_FAILED,
     });
   });
 
   it("should return BadRequestException when fileId is invalid", async () => {
-    const invalidFileId = "test_file_id";
-    (fileRepository.findOne as jest.Mock).mockRejectedValue(null);
+    (mockFileRepository.findOne as jest.Mock).mockRejectedValue(null);
     jest.spyOn(response, "json").mockReturnThis();
 
     await expect(
-      downloadService.downloadFile(response, invalidFileId)
+      downloadService.downloadFile(response, MOCK_DATA.invalidFileId)
     ).rejects.toThrow(new BadRequestException());
   });
 
   it("should return NotFoundException when file is not found", async () => {
-    (fileRepository.findOne as jest.Mock).mockReturnValue({
+    (mockFileRepository.findOne as jest.Mock).mockReturnValue({
       uploadingStatus: null,
     });
     jest.spyOn(response, "json").mockReturnThis();
 
     await expect(
-      downloadService.downloadFile(response, fileID)
+      downloadService.downloadFile(response, MOCK_DATA.fileId)
     ).rejects.toThrow(new NotFoundException(MESSAGE.FILE_NOT_FOUND));
   });
 });
