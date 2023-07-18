@@ -15,5 +15,3 @@ export const SUPPORTED_MAX_FILE_SIZE_IN_BYTES: number =
 export const SUPPORTED_FILE_FORMATS: string[] = configService
   .get("SUPPORTED_FILE_FORMATS")
   .split(",");
-
-export const BASE_URL = configService.get("BASE_URL");

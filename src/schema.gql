@@ -32,7 +32,6 @@ type file {
   uploadingStatus: String!
   size: Float
   reasonOfFailure: String
-  downloadLink: String
   created: DateTime!
   updated: DateTime!
 }
