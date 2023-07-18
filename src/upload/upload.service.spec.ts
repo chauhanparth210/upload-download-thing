@@ -4,7 +4,7 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 import { FileEntity } from "src/file/file.entity";
 import * as fs from "fs";
 import { WriteStream } from "fs-capacitor";
-import { BIG_FILE_SIZE_ERROR_MESSAGE, UPLOAD_TYPE } from "src/constants";
+import { MESSAGE, UPLOAD_TYPE } from "src/constants";
 import { mocked } from "ts-jest/utils";
 
 jest.mock("fs");
@@ -103,7 +103,7 @@ describe("UploadService", () => {
       { id: FileInputs.fileId },
       {
         uploadingStatus: UPLOAD_TYPE.FAILED,
-        reasonOfFailure: BIG_FILE_SIZE_ERROR_MESSAGE,
+        reasonOfFailure: MESSAGE.BIG_FILE_SIZE,
       }
     );
     expect(fs.unlink).toBeCalledTimes(1);

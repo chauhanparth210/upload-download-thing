@@ -5,7 +5,8 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { GraphQLModule } from "@nestjs/graphql";
 import { join } from "path";
 import { FileModule } from "./file/file.module";
-import { UploadModule } from './upload/upload.module';
+import { UploadModule } from "./upload/upload.module";
+import { DownloadModule } from "./download/download.module";
 import * as typeOrmConfigration from "orm.config";
 
 @Module({
@@ -21,6 +22,7 @@ import * as typeOrmConfigration from "orm.config";
     }),
     FileModule,
     UploadModule,
+    DownloadModule,
   ],
   providers: [AppService, AppResolver],
 })

@@ -4,4 +4,5 @@ export const mockFileRepository = {
   manager: {
     query: jest.fn(),
   },
+  findOne: jest.fn(),
 };

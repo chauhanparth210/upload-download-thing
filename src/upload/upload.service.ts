@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { BIG_FILE_SIZE_ERROR_MESSAGE, UPLOAD_TYPE } from "src/constants";
+import { MESSAGE, UPLOAD_TYPE } from "src/constants";
 import { getFilePath } from "src/utils";
 import * as fs from "fs";
 import { SUPPORTED_MAX_FILE_SIZE_IN_BYTES } from "src/config";
@@ -43,7 +43,7 @@ export class UploadService {
               { id: fileId },
               {
                 uploadingStatus: UPLOAD_TYPE.FAILED,
-                reasonOfFailure: BIG_FILE_SIZE_ERROR_MESSAGE,
+                reasonOfFailure: MESSAGE.BIG_FILE_SIZE,
               }
             );
             // delete the truncated file & close the readsteam
