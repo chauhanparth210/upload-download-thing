@@ -13,9 +13,6 @@ export class FileDTO {
   @Field()
   mimetype!: string;
 
-  @Field({ nullable: true })
-  filenameOnBucket: string;
-
   @FilterableField()
   uploadingStatus!: UPLOAD_TYPE;
 
