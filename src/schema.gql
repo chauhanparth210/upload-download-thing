@@ -2,8 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type DeleteFileResponse {
+  message: String
+}
+
 type Mutation {
   uploadFile(file: Upload!): UploadFileResponse!
+  deleteFile(fileId: ID!): DeleteFileResponse!
 }
 
 type Query {
