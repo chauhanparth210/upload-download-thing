@@ -86,7 +86,9 @@
     ],
     "coveragePathIgnorePatterns": [
       "node_modules",
-      "src/migrations"
+      "src/migrations",
+      ".module.ts",
+      "main.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
