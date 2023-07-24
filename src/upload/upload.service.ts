@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { MESSAGE, UPLOAD_TYPE } from "src/constants";
 import { getFilePath } from "src/utils";
 import * as fs from "fs";
@@ -6,7 +6,7 @@ import { SUPPORTED_MAX_FILE_SIZE_IN_BYTES } from "src/config";
 import { Repository } from "typeorm";
 import { FileEntity } from "src/file/file.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import type { ReadStream } from "fs-capacitor";
+import { FileUpload } from "graphql-upload";
 
 @Injectable()
 export class UploadService {
@@ -17,64 +17,60 @@ export class UploadService {
 
   /**
    * Function to store the file on the bucket and save the file location
-   * @param fileReadStream ReadStream to read the file in small chunks
+   * @param createReadStream stream to read the file
    * @param filename name of the file
    * @param fileId file identifier
    * @returns
    */
   storeFile({
-    fileReadStream,
+    createReadStream,
     filename,
     fileId,
   }: {
-    fileReadStream: ReadStream;
+    createReadStream: FileUpload["createReadStream"];
     filename: string;
     fileId: string;
   }) {
     try {
       const filePath = getFilePath(filename);
-
       let byteLength = 0;
-      fileReadStream
-        .on("data", (data: Buffer) => {
-          byteLength += data.length;
-          if (byteLength > SUPPORTED_MAX_FILE_SIZE_IN_BYTES) {
-            this.fileRepository.update(
-              { id: fileId },
-              {
-                uploadingStatus: UPLOAD_TYPE.FAILED,
-                reasonOfFailure: MESSAGE.BIG_FILE_SIZE,
-              }
-            );
-            // delete the truncated file & close the readsteam
-            fs.unlink(filePath, () => {});
-            fileReadStream.destroy();
+      const fileReadStream = createReadStream();
+      const writeStream = fs.createWriteStream(filePath);
+
+      fileReadStream.on("data", (data: Buffer) => {
+        byteLength += data.length;
+        if (byteLength > SUPPORTED_MAX_FILE_SIZE_IN_BYTES) {
+          fileReadStream.destroy(new Error(MESSAGE.BIG_FILE_SIZE));
+        }
+      });
+
+      fileReadStream.on("error", (error) => {
+        writeStream.destroy(error);
+      });
+
+      writeStream.on("finish", () => {
+        this.fileRepository.update(
+          { id: fileId },
+          {
+            uploadingStatus: UPLOAD_TYPE.COMPLETED,
+            size: byteLength,
           }
-        })
-        .pipe(fs.createWriteStream(filePath))
-        .on("finish", () => {
-          this.fileRepository.update(
-            { id: fileId },
-            {
-              uploadingStatus: UPLOAD_TYPE.COMPLETED,
-              size: byteLength,
-            }
-          );
-        })
-        .on("error", (error) => {
-          this.fileRepository.update(
-            { id: fileId },
-            {
-              uploadingStatus: UPLOAD_TYPE.FAILED,
-              reasonOfFailure: error?.message,
-            }
-          );
-          // delete the truncated file & close the readsteam
-          fs.unlink(filePath, () => {});
-          fileReadStream.destroy();
-        });
+        );
+      });
+      writeStream.on("error", (error) => {
+        fs.unlink(filePath, () => {});
+        this.fileRepository.update(
+          { id: fileId },
+          {
+            uploadingStatus: UPLOAD_TYPE.FAILED,
+            reasonOfFailure: error?.message,
+          }
+        );
+      });
+
+      fileReadStream.pipe(writeStream);
     } catch (error) {
-      console.error({ error });
+      throw new InternalServerErrorException(error);
     }
   }
 }

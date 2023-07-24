@@ -52,9 +52,8 @@ export class FileService {
       await this.fileRepository.insert(fileDetails);
       const fileId = fileDetails.id;
 
-      const fileReadStream = createReadStream();
       this.uploadService.storeFile({
-        fileReadStream,
+        createReadStream,
         filename: filenameOnBucket,
         fileId,
       });

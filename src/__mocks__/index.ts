@@ -5,4 +5,5 @@ export const mockFileRepository = {
     query: jest.fn(),
   },
   findOne: jest.fn(),
+  update: jest.fn(),
 };
