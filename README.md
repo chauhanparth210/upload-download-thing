@@ -1,6 +1,8 @@
-## Upload_Download_Thing
+## upload_download_thing
 
 A backend module that can handle file upload, download & metadata
+
+#### [Product documentation](https://docs.google.com/document/d/1pLZfXYkkU2WzHAvS8mzg6n3mP3JT5RAe2Nch0lFgghE/edit?usp=sharing)
 
 ## Installation
 
