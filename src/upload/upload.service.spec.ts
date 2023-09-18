@@ -6,6 +6,8 @@ import * as fs from "fs";
 import { WriteStream } from "fs-capacitor";
 import { MESSAGE, UPLOAD_TYPE } from "src/constants";
 import { mocked } from "ts-jest/utils";
+import { MOCK_DATA } from "src/file/mock";
+import { mockFileRepository } from "src/__mocks__";
 
 jest.mock("fs");
 jest.mock("src/utils", () => ({
@@ -14,19 +16,11 @@ jest.mock("src/utils", () => ({
 }));
 jest.mock("src/config", () => ({
   SUPPORTED_MAX_FILE_SIZE_IN_BYTES: 10,
+  SUPPORTED_MAX_FILE_SIZE: 10 / 1000000,
 }));
 
 describe("UploadService", () => {
   let service: UploadService;
-
-  const fileRepository = {
-    update: jest.fn(),
-  };
-
-  const FileInputs = {
-    filename: "git-cheatsheet.pdf",
-    fileId: "3dd6d207-066c-42e5-bbed-f40ce7355941",
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +28,7 @@ describe("UploadService", () => {
         UploadService,
         {
           provide: getRepositoryToken(FileEntity),
-          useValue: fileRepository,
+          useValue: mockFileRepository,
         },
       ],
     }).compile();
@@ -52,26 +46,23 @@ describe("UploadService", () => {
 
   it("should save success message on successful file upload", () => {
     const mockWriteStream = new WriteStream();
-    const fileReadStream = mockWriteStream.createReadStream();
-
-    const newFileReadStream = fileReadStream;
-    newFileReadStream.pipe = jest.fn();
+    mockWriteStream.pipe = jest.fn();
 
     mocked(fs).createWriteStream.mockReturnValue(mockWriteStream);
-    mocked(newFileReadStream).pipe.mockReturnThis();
+    mocked(mockWriteStream).pipe.mockReturnThis();
 
     service.storeFile({
-      fileReadStream: newFileReadStream,
-      filename: FileInputs.filename,
-      fileId: FileInputs.fileId,
+      createReadStream: () => mockWriteStream,
+      filename: MOCK_DATA.mockFile.filename,
+      fileId: MOCK_DATA.fileId,
     });
 
-    fileReadStream.emit("data", "valid file");
-    fileReadStream.emit("finish");
+    mockWriteStream.emit("data", "valid file");
+    mockWriteStream.emit("finish");
 
-    expect(fileRepository.update).toBeCalledTimes(1);
-    expect(fileRepository.update).toBeCalledWith(
-      { id: FileInputs.fileId },
+    expect(mockFileRepository.update).toBeCalledTimes(1);
+    expect(mockFileRepository.update).toBeCalledWith(
+      { id: MOCK_DATA.fileId },
       {
         uploadingStatus: UPLOAD_TYPE.COMPLETED,
         size: 10,
@@ -81,26 +72,27 @@ describe("UploadService", () => {
 
   it("should update database when the file size was big", () => {
     const mockWriteStream = new WriteStream();
-    const fileReadStream = mockWriteStream.createReadStream();
-
-    const newFileReadStream = fileReadStream;
-    newFileReadStream.pipe = jest.fn();
+    mockWriteStream.pipe = jest.fn();
+    mockWriteStream.destroy = jest.fn();
 
     mocked(fs).createWriteStream.mockReturnValue(mockWriteStream);
     mocked(fs).unlink.mockReturnValue();
-    mocked(newFileReadStream).pipe.mockReturnThis();
-
-    service.storeFile({
-      fileReadStream: newFileReadStream,
-      filename: FileInputs.filename,
-      fileId: FileInputs.fileId,
+    mocked(mockWriteStream).pipe.mockReturnThis();
+    mocked(mockWriteStream).destroy.mockImplementationOnce((error: Error) => {
+      mockWriteStream.emit("error", error);
     });
 
-    fileReadStream.emit("data", "file is too big");
+    service.storeFile({
+      createReadStream: () => mockWriteStream,
+      filename: MOCK_DATA.mockFile.filename,
+      fileId: MOCK_DATA.fileId,
+    });
 
-    expect(fileRepository.update).toBeCalledTimes(1);
-    expect(fileRepository.update).toBeCalledWith(
-      { id: FileInputs.fileId },
+    mockWriteStream.emit("data", "file is too big");
+
+    expect(mockFileRepository.update).toBeCalledTimes(1);
+    expect(mockFileRepository.update).toBeCalledWith(
+      { id: MOCK_DATA.fileId },
       {
         uploadingStatus: UPLOAD_TYPE.FAILED,
         reasonOfFailure: MESSAGE.BIG_FILE_SIZE,
@@ -111,27 +103,23 @@ describe("UploadService", () => {
 
   it("should throw error when steam having issue", () => {
     const mockWriteStream = new WriteStream();
-    const fileReadStream = mockWriteStream.createReadStream();
-
-    const newFileReadStream = fileReadStream;
-    newFileReadStream.pipe = jest.fn();
+    mockWriteStream.pipe = jest.fn();
 
     mocked(fs).createWriteStream.mockReturnValue(mockWriteStream);
-    mocked(fs).unlink.mockReturnValue();
-    mocked(newFileReadStream).pipe.mockReturnThis();
+    mocked(mockWriteStream).pipe.mockReturnThis();
 
     service.storeFile({
-      fileReadStream: newFileReadStream,
-      filename: FileInputs.filename,
-      fileId: FileInputs.fileId,
+      createReadStream: () => mockWriteStream,
+      filename: MOCK_DATA.mockFile.filename,
+      fileId: MOCK_DATA.fileId,
     });
 
-    fileReadStream.emit("data", "valid file");
-    fileReadStream.emit("error", new Error("stream failed"));
+    mockWriteStream.emit("data", "valid file");
+    mockWriteStream.emit("error", new Error("stream failed"));
 
-    expect(fileRepository.update).toBeCalledTimes(1);
-    expect(fileRepository.update).toBeCalledWith(
-      { id: FileInputs.fileId },
+    expect(mockFileRepository.update).toBeCalledTimes(1);
+    expect(mockFileRepository.update).toBeCalledWith(
+      { id: MOCK_DATA.fileId },
       {
         uploadingStatus: UPLOAD_TYPE.FAILED,
         reasonOfFailure: "stream failed",

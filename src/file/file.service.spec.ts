@@ -61,7 +61,6 @@ describe("FileService", () => {
       expect(response).toEqual(MOCK_DATA.mockResponseFromUploadFileMuation);
       expect(mockFileRepository.create).toBeCalledTimes(1);
       expect(mockFileRepository.insert).toBeCalledTimes(1);
-      expect(MOCK_DATA.mockFile.createReadStream).toBeCalledTimes(1);
       expect(uploadService.storeFile).toBeCalledTimes(1);
     });
 
